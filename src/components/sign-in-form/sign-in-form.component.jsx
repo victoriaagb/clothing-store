@@ -1,16 +1,14 @@
-import { useEffect, useState } from "react";
-import { getRedirectResult } from "firebase/auth";
+import { useState, useContext } from "react";
 
 import {
-  auth,
   signInWithGooglePopup,
-  signInWithGoogleRedirect,
   signInUserWithEmailAndPassword,
   createUserDocumentFromAuth,
 } from "../../utils/firebase/firebase.utils";
 
 import Button from "../button/button.component";
 import FormInput from "../form-input/form-input.component";
+import { UserContext } from "../../context/user.context";
 import "./sign-in-form.styles.scss";
 
 const defaultFormFields = {
@@ -21,18 +19,19 @@ const defaultFormFields = {
 const SignInForm = () => {
   const [formFields, setFormFields] = useState(defaultFormFields);
   const { email, password } = formFields;
+  // const { setCurrentUser } = useContext(UserContext);
 
-  useEffect(() => {
-    const getRedirectResultHandler = async () => {
-      const response = await getRedirectResult(auth);
-      if (response) {
-        const userDocRef = await createUserDocumentFromAuth(response.user);
-        console.log(userDocRef);
-      }
-    };
+  // useEffect(() => {
+  //   const getRedirectResultHandler = async () => {
+  //     const response = await getRedirectResult(auth);
+  //     if (response) {
+  //       const userDocRef = await createUserDocumentFromAuth(response.user);
+  //       console.log(userDocRef);
+  //     }
+  //   };
 
-    getRedirectResultHandler();
-  }, []);
+  //   getRedirectResultHandler();
+  // }, []);
 
   const resetFormFields = () => {
     setFormFields(defaultFormFields);
@@ -41,7 +40,7 @@ const SignInForm = () => {
   const logGoogleUser = async () => {
     try {
       const { user } = await signInWithGooglePopup();
-      const userDocRef = await createUserDocumentFromAuth(user);
+      // setCurrentUser(user);
     } catch (error) {
       alert("Issue signing in with Google");
       console.error(error);
@@ -49,13 +48,11 @@ const SignInForm = () => {
   };
 
   const handleSubmit = async (event) => {
-    console.log("handleSubmit");
-    console.log(formFields);
     event.preventDefault();
     try {
-      const userDocRef = await signInUserWithEmailAndPassword(email, password);
+      const { user } = await signInUserWithEmailAndPassword(email, password);
+      // setCurrentUser(user);
       resetFormFields();
-      console.log(userDocRef);
     } catch (error) {
       switch (error.code) {
         case "auth/wrong-password":
